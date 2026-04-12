@@ -4,7 +4,26 @@
   "description": "Movie and Series Rating Portal where users can explore, rate, and review movies and TV series.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "lint": "eslint ./src/**/*",
+    "migrate": "prisma migrate dev",
+    "generate": "prisma generate",
+    "studio": "prisma studio",
+    "push": "prisma db push",
+    "pull": "prisma db pull",
+    "build": "tsc -p .",
+    "start": "node dist/server.js"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "homepage": "https://github.com/TOMJID/chintube-backend#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   },
   "repository": {
     "type": "git",
@@ -15,12 +34,5 @@
   "type": "module",
   "bugs": {
     "url": "https://github.com/TOMJID/chintube-backend/issues"
-  },
-  "packageManager": "pnpm@10.33.0",
-  "homepage": "https://github.com/TOMJID/chintube-backend#readme",
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "tsx": "^4.21.0",
-    "typescript": "^6.0.2"
   }
 }
