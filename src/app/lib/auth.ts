@@ -19,8 +19,7 @@ export const auth = betterAuth({
       role: {
         type: "string",
         defaultValue: Role.USER,
-      }
-    }
-  }
-
+      },
+    },
+  },
 });
