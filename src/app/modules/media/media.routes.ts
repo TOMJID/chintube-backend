@@ -6,4 +6,4 @@ const router = Router();
 
 router.post("/create", verifyAdmin, mediaController.createMedia);
 
-export default router;
+export const MediaRoutes = router;
