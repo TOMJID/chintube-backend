@@ -12,9 +12,43 @@ enum Role {
   ADMIN
 }
 
+enum Genre {
+  ACTION
+  ADVENTURE
+  ANIMATION
+  COMEDY
+  CRIME
+  DOCUMENTARY
+  DRAMA
+  FAMILY
+  FANTASY
+  HORROR
+  MYSTERY
+  ROMANCE
+  SCI_FI
+  THRILLER
+  WAR
+  WESTERN
+  K_DRAMA
+  ANIME
+}
+
 enum MediaType {
   MOVIE
   SERIES
+}
+
+enum Tag {
+  CLASSIC
+  MUST_WATCH
+  UNDERRATED
+  FAMILY_FRIENDLY
+  SPOILER
+  TRENDING
+  CRITIC_CHOICE
+  HIDDEN_GEM
+  FEEL_GOOD
+  INTENSE
 }
 
 enum PriceTier {
@@ -34,6 +68,7 @@ enum PaymentStatus {
   FAILED
 }
 
+//? better-auth models
 model User {
   id            String    @id
   name          String
@@ -45,6 +80,9 @@ model User {
   role          String    @default("USER")
   sessions      Session[]
   accounts      Account[]
+  reviews       Review[]
+  comments      Comment[]
+  likes         Like[]
 
   @@unique([email])
   @@map("user")
@@ -96,4 +134,74 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+//? media model
+model Media {
+  id           String    @id @default(uuid())
+  title        String
+  type         MediaType
+  synopsis     String    @db.Text
+  genre        Genre[]
+  releaseYear  Int
+  director     String
+  cast         String[]
+  streamingUrl String // YouTube link
+  priceTier    PriceTier @default(FREE)
+  price        Float? // For individual BUY/RENT
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  reviews Review[]
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  rating      Int // 1-10
+  content     String   @db.Text
+  tags        Tag[] // e.g., ["classic", "underrated"]
+  hasSpoilers Boolean  @default(false)
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  authorId String
+  author   User      @relation(fields: [authorId], references: [id])
+  mediaId  String
+  media    Media     @relation(fields: [mediaId], references: [id])
+  comments Comment[]
+  likes    Like[]
+
+  @@unique([authorId, mediaId]) // One review per user per title
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //? Relations
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+  reviewId String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  // Nested Replies
+  parentId String?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  reviewId String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
 }

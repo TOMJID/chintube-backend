@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-const auth = (...roles: Role[]) => {
+const authCheck = (...roles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const session = await betterAuth.api.getSession({
@@ -61,7 +61,7 @@ const auth = (...roles: Role[]) => {
   };
 };
 
-export const verifyUser = auth(Role.USER);
-export const verifyAdmin = auth(Role.ADMIN);
+export const verifyUser = authCheck(Role.USER);
+export const verifyAdmin = authCheck(Role.ADMIN);
 
-export default auth;
+export default authCheck;
