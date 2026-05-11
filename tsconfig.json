@@ -9,7 +9,8 @@
     "baseUrl": ".",
     "paths": {
       "@lib/*": ["./src/app/lib/*"],
-      "@utils/*": ["./src/app/utils/*"]
+      "@utils/*": ["./src/app/utils/*"],
+      "@middleware/*": ["./src/app/middleware/*"]
     }
   },
   "include": ["src", "prisma.config.ts"],
