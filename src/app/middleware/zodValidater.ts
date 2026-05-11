@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import z from "zod";
 
-export const validateRequest = (zodobject: z.ZodObject) => {
+export const zodValidator = (zodobject: z.ZodObject) => {
   return (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
     if (req.body.data) {

@@ -1,10 +1,17 @@
+import { zodValidator } from "@middleware/zodValidater";
 import { verifyAdmin } from "@middleware/checkAuth";
 import { Router } from "express";
 
+import { mediaValidators } from "./media.validation";
 import { mediaController } from "./media.controller";
 
 const router = Router();
 
-router.post("/create", verifyAdmin, mediaController.createMedia);
+router.post(
+  "/create",
+  verifyAdmin,
+  zodValidator(mediaValidators.create),
+  mediaController.createMedia,
+);
 
 export const MediaRoutes = router;

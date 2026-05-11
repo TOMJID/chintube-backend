@@ -5,7 +5,7 @@ import status from "http-status";
 import { mediaService } from "./media.service";
 
 const createMedia = async (req: Request, res: Response) => {
-  const result = await mediaService.createMedia();
+  const result = await mediaService.createMedia(req.body);
 
   sendResponse(res, {
     httpStatusCode: status.CREATED,
