@@ -5,7 +5,11 @@
     "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@lib/*": ["./src/app/lib/*"]
+    }
   },
   "include": ["src", "prisma.config.ts"],
   "exclude": ["node_modules", "dist"]
