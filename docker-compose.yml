@@ -1,0 +1,22 @@
+services:
+  chintubeDB:
+    container_name: db
+    image: postgres:18.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chintube
+    ports:
+      - "5432:5432"
+    volumes:
+      - chintube-db-data:/var/lib/postgresql
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  chintube-db-data:
+    name: chintube-db
