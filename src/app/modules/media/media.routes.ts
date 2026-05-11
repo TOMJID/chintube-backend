@@ -1,4 +1,4 @@
-import { verifyAdmin } from "@middleware/checkAuth.middleware";
+import { verifyAdmin } from "@middleware/checkAuth";
 import { Router } from "express";
 
 import { mediaController } from "./media.controller";

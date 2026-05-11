@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { auth as betterAuth } from "../lib/auth";
+
 import { Role } from "../../../generated/prisma/enums";
+import { auth as betterAuth } from "../lib/auth";
 
 //? setting global types for user
 declare global {
@@ -63,5 +64,3 @@ const authCheck = (...roles: Role[]) => {
 
 export const verifyUser = authCheck(Role.USER);
 export const verifyAdmin = authCheck(Role.ADMIN);
-
-export default authCheck;
