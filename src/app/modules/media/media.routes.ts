@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { mediaController } from "./media.controller";
+
 import { verifyAdmin } from "../../middleware/checkAuth.middleware";
+import { mediaController } from "./media.controller";
 
 const router = Router();
 

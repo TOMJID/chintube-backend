@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { sendResponse } from "../../shared/sendResponse";
 import status from "http-status";
+
+import { sendResponse } from "../../shared/sendResponse";
 
 const createMedia = async (req: Request, res: Response) => {
   sendResponse(res, {
