@@ -8,7 +8,8 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@lib/*": ["./src/app/lib/*"]
+      "@lib/*": ["./src/app/lib/*"],
+      "@utils/*": ["./src/app/utils/*"]
     }
   },
   "include": ["src", "prisma.config.ts"],
