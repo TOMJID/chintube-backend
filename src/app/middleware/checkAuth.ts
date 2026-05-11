@@ -1,6 +1,6 @@
+import { Role } from "@orm/generated/prisma-client/enums";
 import { NextFunction, Request, Response } from "express";
 
-import { Role } from "../orm/generated/prisma-client/enums";
 import { auth as betterAuth } from "../lib/auth";
 
 //? setting global types for user

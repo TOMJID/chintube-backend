@@ -12,7 +12,8 @@
     "paths": {
       "@lib/*": ["./src/app/lib/*"],
       "@utils/*": ["./src/app/utils/*"],
-      "@middleware/*": ["./src/app/middleware/*"]
+      "@middleware/*": ["./src/app/middleware/*"],
+      "@orm/*": ["./src/app/orm/*"]
     }
   },
   "include": ["src", "prisma.config.ts"],
