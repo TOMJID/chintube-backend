@@ -1,4 +1,4 @@
-import { zodValidator } from "@middleware/zodValidater";
+import { zodValidator } from "@middleware/zodValidator";
 import { verifyAdmin } from "@middleware/checkAuth";
 import { Router } from "express";
 

@@ -1,7 +1,9 @@
-import { toNodeHandler } from "better-auth/node";
+import { globalErrorHandler } from "@middleware/globalErrorHandler";
 import express, { Application, Request, Response } from "express";
-import { auth } from "./app/lib/auth";
+import { toNodeHandler } from "better-auth/node";
+
 import { RoutesIndex } from "./app/routes";
+import { auth } from "./app/lib/auth";
 
 const app: Application = express();
 
@@ -16,5 +18,8 @@ app.get("/", (req: Request, res: Response) => {
 
 //? api routes
 app.use("/api/v1", RoutesIndex);
+
+// global error handler
+app.use(globalErrorHandler);
 
 export default app;
