@@ -64,3 +64,5 @@ const authCheck = (...roles: Role[]) => {
 
 export const verifyUser = authCheck(Role.USER);
 export const verifyAdmin = authCheck(Role.ADMIN);
+
+export default authCheck;
