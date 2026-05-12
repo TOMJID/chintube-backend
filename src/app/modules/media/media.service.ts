@@ -1,26 +1,33 @@
+import { Media, Prisma } from "@orm/generated/prisma-client/client";
+import { Genre } from "@orm/generated/prisma-client/enums";
+import { QueryBuilder } from "@utils/queryBuilder";
 import { prisma } from "@lib/prisma";
 
-const createMedia = async (data: any) => {
-  const result = await prisma.media.create({
-    data,
-  });
+import { createMediaQueryBuilder } from "./query";
 
+const createMedia = async (data: any) => {
+  const result = await prisma.media.create({ data });
   return result;
 };
 
 const listMedia = async ({ skip = 0, take = 10, filters = {} }: any) => {
-  const where: any = {};
+  // Map existing params to QueryBuilder-compatible params
   const { q, genre, type, releaseYear } = filters || {};
 
-  if (q) {
-    where.OR = [
-      { title: { contains: q, mode: "insensitive" } },
-      { synopsis: { contains: q, mode: "insensitive" } },
-      { director: { contains: q, mode: "insensitive" } },
-    ];
-  }
+  const page = Math.floor(skip / take) + 1;
 
-  if (type) where.type = type;
+  const queryParams: Record<string, unknown> = {
+    page: String(page),
+    limit: String(take),
+  };
+
+  if (q) queryParams.searchTerm = q;
+
+  if (type)
+    queryParams.type =
+      typeof type === "string" ? String(type).toUpperCase() : type;
+
+  if (releaseYear) queryParams.releaseYear = String(releaseYear);
 
   if (genre) {
     const genres = Array.isArray(genre)
@@ -28,25 +35,35 @@ const listMedia = async ({ skip = 0, take = 10, filters = {} }: any) => {
       : typeof genre === "string"
         ? genre.split(",").map((g: string) => g.trim())
         : [];
-    if (genres.length === 1) where.genre = { has: genres[0] };
-    else if (genres.length > 1) where.genre = { hasSome: genres };
+
+    const normalize = (s: string) =>
+      s
+        .toString()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
+    const enumValues = Object.values(Genre);
+    const normalizedMap: Record<string, string> = enumValues.reduce(
+      (acc, val) => {
+        acc[normalize(val)] = val;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    const mappedGenres = genres
+      .map((g: string) => normalizedMap[normalize(g)])
+      .filter(Boolean) as string[];
+
+    if (mappedGenres.length === 1) queryParams["genre(has)"] = mappedGenres[0];
+    else if (mappedGenres.length > 1)
+      queryParams["genre(hasSome)"] = mappedGenres;
   }
 
-  if (releaseYear) where.releaseYear = Number(releaseYear);
+  const qb = createMediaQueryBuilder(queryParams as any);
 
-  const [items, total] = await Promise.all([
-    prisma.media.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.media.count({ where }),
-  ]);
+  const results = await qb.search().filter().paginate().sort().execute();
 
-  const page = Math.floor(skip / take) + 1;
-
-  return { items, total, page, limit: take };
+  return results;
 };
 
 export const mediaService = {
