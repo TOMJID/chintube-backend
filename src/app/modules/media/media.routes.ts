@@ -17,4 +17,11 @@ router.post(
   mediaController.createMedia,
 );
 
+router.patch(
+  "/:id",
+  verifyAdmin,
+  zodValidator(mediaValidators.update),
+  mediaController.updateMedia,
+);
+
 export const MediaRoutes = router;

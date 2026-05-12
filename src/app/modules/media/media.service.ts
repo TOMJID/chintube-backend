@@ -1,6 +1,4 @@
-import { Media, Prisma } from "@orm/generated/prisma-client/client";
 import { Genre } from "@orm/generated/prisma-client/enums";
-import { QueryBuilder } from "@utils/queryBuilder";
 import { prisma } from "@lib/prisma";
 
 import { createMediaQueryBuilder } from "./query";
@@ -75,8 +73,24 @@ const getMediaById = async (id: string) => {
   return result;
 };
 
+const updateMedia = async (id: string, data: any) => {
+  try {
+    const updated = await prisma.media.update({
+      where: { id },
+      data,
+    });
+
+    return updated;
+  } catch (error: any) {
+    // Prisma error P2025 = Record to update not found.
+    if (error?.code === "P2025") return null;
+    throw error;
+  }
+};
+
 export const mediaService = {
   createMedia,
   listMedia,
   getMediaById,
+  updateMedia,
 };

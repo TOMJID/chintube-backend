@@ -61,8 +61,31 @@ const getMediaById = async (req: Request, res: Response) => {
   });
 };
 
+const updateMedia = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const payload = req.body;
+
+  const result = await mediaService.updateMedia(id as string, payload);
+
+  if (!result) {
+    return sendResponse(res, {
+      httpStatusCode: status.NOT_FOUND,
+      success: false,
+      message: "Media not found",
+    });
+  }
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Media updated successfully",
+    data: result,
+  });
+};
+
 export const mediaController = {
   createMedia,
   listMedia,
   getMediaById,
+  updateMedia,
 };

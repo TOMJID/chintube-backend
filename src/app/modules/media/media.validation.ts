@@ -28,6 +28,9 @@ export const CreateMediaSchema = z.object({
   price: z.number().positive().optional(),
 });
 
+export const UpdateMediaSchema = CreateMediaSchema.partial();
+
 export const mediaValidators = {
   create: CreateMediaSchema,
+  update: UpdateMediaSchema,
 };
