@@ -83,8 +83,46 @@ const getReviewById = async (req: Request, res: Response) => {
   });
 };
 
+const updateReview = async (req: Request, res: Response) => {
+  const user = req.user;
+
+  if (!user) {
+    return sendResponse(res, {
+      httpStatusCode: status.UNAUTHORIZED,
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { id } = req.params;
+  const payload = req.body;
+
+  const result = await reviewService.updateReview(
+    user.id,
+    id as string,
+    payload,
+    user.role,
+  );
+
+  if (!result) {
+    return sendResponse(res, {
+      httpStatusCode: status.NOT_FOUND,
+      success: false,
+      message: "Review not found",
+    });
+  }
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Review updated successfully",
+    data: result,
+  });
+};
+
 export const reviewController = {
   createReview,
   listReviews,
   getReviewById,
+  updateReview,
 };

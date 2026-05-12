@@ -1,3 +1,4 @@
+import { Role } from "@orm/generated/prisma-client/enums";
 import { prisma } from "@lib/prisma";
 
 import AppError from "../../errorHelper/AppError";
@@ -96,8 +97,60 @@ const getReviewById = async (id: string) => {
   return result;
 };
 
+const updateReview = async (
+  userId: string,
+  id: string,
+  data: any,
+  userRole?: Role,
+) => {
+  const existing = await prisma.review.findUnique({ where: { id } });
+
+  if (!existing) return null;
+
+  // Only author or admin can update
+  if (userRole !== Role.ADMIN && existing.authorId !== userId) {
+    throw new AppError(403, "Forbidden: you can only update your own review");
+  }
+
+  const allowedFields = ["rating", "content", "tags", "hasSpoilers"];
+  const updateData: any = {};
+
+  for (const field of allowedFields) {
+    if (Object.prototype.hasOwnProperty.call(data, field)) {
+      updateData[field] = data[field];
+    }
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, "isApproved")) {
+    if (userRole !== Role.ADMIN) {
+      throw new AppError(403, "Forbidden: only admins can set isApproved");
+    }
+    updateData.isApproved = !!data.isApproved;
+  }
+
+  if (Object.keys(updateData).length === 0) return existing;
+
+  try {
+    const updated = await prisma.review.update({
+      where: { id },
+      data: updateData,
+      include: {
+        author: true,
+        media: true,
+        _count: { select: { comments: true, likes: true } },
+      },
+    });
+
+    return updated;
+  } catch (error: any) {
+    if (error?.code === "P2025") return null;
+    throw error;
+  }
+};
+
 export const reviewService = {
   createReview,
   listReviews,
   getReviewById,
+  updateReview,
 };

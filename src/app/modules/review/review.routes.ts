@@ -1,5 +1,5 @@
+import authCheck, { verifyUser } from "@middleware/checkAuth";
 import { zodValidator } from "@middleware/zodValidator";
-import { verifyUser } from "@middleware/checkAuth";
 import { Router } from "express";
 
 import { reviewValidators } from "./review.validation";
@@ -16,5 +16,11 @@ router.post(
 
 router.get("/", reviewController.listReviews);
 router.get("/:id", reviewController.getReviewById);
+router.patch(
+  "/:id",
+  authCheck(),
+  zodValidator(reviewValidators.update),
+  reviewController.updateReview,
+);
 
 export const ReviewRoutes = router;

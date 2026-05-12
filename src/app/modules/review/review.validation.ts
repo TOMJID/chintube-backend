@@ -11,6 +11,20 @@ export const CreateReviewSchema = z.object({
   mediaId: z.string().min(1, "mediaId is required"),
 });
 
+export const UpdateReviewSchema = z.object({
+  rating: z
+    .number()
+    .int()
+    .min(1, "Rating must be between 1 and 10")
+    .max(10)
+    .optional(),
+  content: z.string().min(1, "Content is required").optional(),
+  tags: z.array(ZodTag).optional(),
+  hasSpoilers: z.boolean().optional(),
+  isApproved: z.boolean().optional(),
+});
+
 export const reviewValidators = {
   create: CreateReviewSchema,
+  update: UpdateReviewSchema,
 };
