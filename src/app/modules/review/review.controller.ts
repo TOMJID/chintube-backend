@@ -120,9 +120,45 @@ const updateReview = async (req: Request, res: Response) => {
   });
 };
 
+const deleteReview = async (req: Request, res: Response) => {
+  const user = req.user;
+
+  if (!user) {
+    return sendResponse(res, {
+      httpStatusCode: status.UNAUTHORIZED,
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { id } = req.params;
+
+  const result = await reviewService.deleteReview(
+    user.id,
+    id as string,
+    user.role,
+  );
+
+  if (!result) {
+    return sendResponse(res, {
+      httpStatusCode: status.NOT_FOUND,
+      success: false,
+      message: "Review not found",
+    });
+  }
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Review deleted successfully",
+    data: result,
+  });
+};
+
 export const reviewController = {
   createReview,
   listReviews,
   getReviewById,
   updateReview,
+  deleteReview,
 };

@@ -148,9 +148,36 @@ const updateReview = async (
   }
 };
 
+const deleteReview = async (userId: string, id: string, userRole?: Role) => {
+  const existing = await prisma.review.findUnique({ where: { id } });
+
+  if (!existing) return null;
+
+  if (userRole !== Role.ADMIN && existing.authorId !== userId) {
+    throw new AppError(403, "Forbidden: you can only delete your own review");
+  }
+
+  try {
+    const deleted = await prisma.review.delete({
+      where: { id },
+      include: {
+        author: true,
+        media: true,
+        _count: { select: { comments: true, likes: true } },
+      },
+    });
+
+    return deleted;
+  } catch (error: any) {
+    if (error?.code === "P2025") return null;
+    throw error;
+  }
+};
+
 export const reviewService = {
   createReview,
   listReviews,
   getReviewById,
   updateReview,
+  deleteReview,
 };

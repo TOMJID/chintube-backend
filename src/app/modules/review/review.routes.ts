@@ -22,5 +22,6 @@ router.patch(
   zodValidator(reviewValidators.update),
   reviewController.updateReview,
 );
+router.delete("/:id", authCheck(), reviewController.deleteReview);
 
 export const ReviewRoutes = router;
