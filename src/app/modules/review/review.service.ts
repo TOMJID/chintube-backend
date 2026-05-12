@@ -81,7 +81,23 @@ const listReviews = async ({ skip = 0, take = 10, filters = {} }: any) => {
   };
 };
 
+const getReviewById = async (id: string) => {
+  const result = await prisma.review.findUnique({
+    where: { id },
+    include: {
+      author: true,
+      media: true,
+      comments: { orderBy: { createdAt: "desc" } },
+      likes: true,
+      _count: { select: { comments: true, likes: true } },
+    },
+  });
+
+  return result;
+};
+
 export const reviewService = {
   createReview,
   listReviews,
+  getReviewById,
 };

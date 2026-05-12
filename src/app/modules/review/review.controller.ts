@@ -62,7 +62,29 @@ const listReviews = async (req: Request, res: Response) => {
   });
 };
 
+const getReviewById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await reviewService.getReviewById(id as string);
+
+  if (!result) {
+    return sendResponse(res, {
+      httpStatusCode: status.NOT_FOUND,
+      success: false,
+      message: "Review not found",
+    });
+  }
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Review retrieved successfully",
+    data: result,
+  });
+};
+
 export const reviewController = {
   createReview,
   listReviews,
+  getReviewById,
 };
