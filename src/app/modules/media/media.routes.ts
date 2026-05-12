@@ -7,6 +7,8 @@ import { mediaController } from "./media.controller";
 
 const router = Router();
 
+router.get("/", mediaController.listMedia);
+
 router.post(
   "/create",
   verifyAdmin,
