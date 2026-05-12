@@ -35,6 +35,53 @@ const createReview = async (userId: string, payload: any) => {
   return result;
 };
 
+const listReviews = async ({ skip = 0, take = 10, filters = {} }: any) => {
+  const { mediaId, authorId, q, minRating, maxRating, isApproved } =
+    filters || {};
+
+  const where: any = {};
+
+  if (mediaId) where.mediaId = mediaId;
+  if (authorId) where.authorId = authorId;
+  if (typeof isApproved === "boolean") where.isApproved = isApproved;
+
+  if (minRating || maxRating) {
+    where.rating = {};
+    if (minRating) where.rating.gte = Number(minRating);
+    if (maxRating) where.rating.lte = Number(maxRating);
+  }
+
+  if (q) {
+    where.content = { contains: String(q), mode: "insensitive" };
+  }
+
+  const [items, total] = await Promise.all([
+    prisma.review.findMany({
+      where,
+      skip,
+      take,
+      orderBy: { createdAt: "desc" },
+      include: {
+        author: true,
+        media: true,
+        _count: { select: { comments: true, likes: true } },
+      },
+    }),
+    prisma.review.count({ where }),
+  ]);
+
+  return {
+    items,
+    meta: {
+      total,
+      page: Math.floor(skip / take) + 1,
+      limit: take,
+      totalPages: Math.ceil(total / take) || 1,
+    },
+  };
+};
+
 export const reviewService = {
   createReview,
+  listReviews,
 };

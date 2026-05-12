@@ -27,6 +27,42 @@ const createReview = async (req: Request, res: Response) => {
   });
 };
 
+const listReviews = async (req: Request, res: Response) => {
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const limit = Math.max(Number(req.query.limit) || 10, 1);
+  const skip = (page - 1) * limit;
+
+  const { mediaId, authorId, q, minRating, maxRating, isApproved } =
+    req.query as any;
+
+  const result = await reviewService.listReviews({
+    skip,
+    take: limit,
+    filters: {
+      mediaId: mediaId as string | undefined,
+      authorId: authorId as string | undefined,
+      q: q as string | undefined,
+      minRating: minRating ? Number(minRating) : undefined,
+      maxRating: maxRating ? Number(maxRating) : undefined,
+      isApproved:
+        isApproved === "true"
+          ? true
+          : isApproved === "false"
+            ? false
+            : undefined,
+    },
+  });
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Reviews retrieved successfully",
+    data: result.items,
+    meta: result.meta,
+  });
+};
+
 export const reviewController = {
   createReview,
+  listReviews,
 };

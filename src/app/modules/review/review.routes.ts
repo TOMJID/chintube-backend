@@ -14,4 +14,6 @@ router.post(
   reviewController.createReview,
 );
 
+router.get("/", reviewController.listReviews);
+
 export const ReviewRoutes = router;
