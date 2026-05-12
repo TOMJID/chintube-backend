@@ -8,6 +8,7 @@ import { mediaController } from "./media.controller";
 const router = Router();
 
 router.get("/", mediaController.listMedia);
+router.get("/:id", mediaController.getMediaById);
 
 router.post(
   "/create",

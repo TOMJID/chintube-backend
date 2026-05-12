@@ -28,7 +28,6 @@ export const CreateMediaSchema = z.object({
   price: z.number().positive().optional(),
 });
 
-// Export commonly used validators for route middleware
 export const mediaValidators = {
   create: CreateMediaSchema,
 };

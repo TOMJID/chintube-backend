@@ -66,7 +66,17 @@ const listMedia = async ({ skip = 0, take = 10, filters = {} }: any) => {
   return results;
 };
 
+const getMediaById = async (id: string) => {
+  const result = await prisma.media.findUnique({
+    where: { id },
+    include: { reviews: true, _count: true },
+  });
+
+  return result;
+};
+
 export const mediaService = {
   createMedia,
   listMedia,
+  getMediaById,
 };
