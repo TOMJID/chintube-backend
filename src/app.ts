@@ -5,6 +5,7 @@ import { toNodeHandler } from "better-auth/node";
 import { RoutesIndex } from "./app/routes";
 import { auth } from "./app/lib/auth";
 
+
 const app: Application = express();
 
 app.use(express.json());
