@@ -52,7 +52,43 @@ const createReply = async (userId: string, payload: any) => {
   return createComment(userId, payload);
 };
 
+const listComments = async ({ reviewId, skip = 0, take = 10 }: any) => {
+  if (!reviewId) {
+    throw new AppError(400, "reviewId is required");
+  }
+
+  const where: any = { reviewId, parentId: null };
+
+  const [items, total] = await Promise.all([
+    prisma.comment.findMany({
+      where,
+      skip,
+      take,
+      orderBy: { createdAt: "desc" },
+      include: {
+        author: true,
+        replies: {
+          orderBy: { createdAt: "asc" },
+          include: { author: true },
+        },
+      },
+    }),
+    prisma.comment.count({ where }),
+  ]);
+
+  return {
+    items,
+    meta: {
+      total,
+      page: Math.floor(skip / take) + 1,
+      limit: take,
+      totalPages: Math.ceil(total / take) || 1,
+    },
+  };
+};
+
 export const commentService = {
   createComment,
   createReply,
+  listComments,
 };

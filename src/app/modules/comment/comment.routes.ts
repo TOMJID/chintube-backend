@@ -8,6 +8,9 @@ import { commentController } from "./comment.controller";
 
 const router = Router();
 
+// List comments for a review (top-level comments with replies)
+router.get("/:reviewId", commentController.listComments);
+
 // Create a top-level comment (no parentId)
 router.post(
   "/create",

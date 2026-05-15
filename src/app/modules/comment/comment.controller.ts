@@ -60,7 +60,30 @@ const replyComment = async (req: Request, res: Response) => {
   });
 };
 
+const listComments = async (req: Request, res: Response) => {
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const limit = Math.max(Number(req.query.limit) || 10, 1);
+  const skip = (page - 1) * limit;
+
+  const { reviewId } = req.params as any;
+
+  const result = await commentService.listComments({
+    reviewId: reviewId as string | undefined,
+    skip,
+    take: limit,
+  });
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Comments retrieved successfully",
+    data: result.items,
+    meta: result.meta,
+  });
+};
+
 export const commentController = {
   createMainComment,
   replyComment,
+  listComments,
 };
