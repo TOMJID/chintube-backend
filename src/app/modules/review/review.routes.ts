@@ -5,11 +5,12 @@ import { Router } from "express";
 import { reviewValidators } from "./review.validation";
 import { reviewController } from "./review.controller";
 
+
 const router = Router();
 
 router.post(
   "/create",
-  verifyUser,
+  authCheck(),
   zodValidator(reviewValidators.create),
   reviewController.createReview,
 );

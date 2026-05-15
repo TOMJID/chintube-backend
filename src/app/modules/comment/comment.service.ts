@@ -42,6 +42,17 @@ const createComment = async (userId: string, payload: any) => {
   return result;
 };
 
+const createReply = async (userId: string, payload: any) => {
+  const { parentId } = payload;
+
+  if (!parentId) {
+    throw new AppError(400, "parentId is required for replies");
+  }
+
+  return createComment(userId, payload);
+};
+
 export const commentService = {
   createComment,
+  createReply,
 };

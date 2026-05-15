@@ -1,5 +1,5 @@
 import { zodValidator } from "@middleware/zodValidator";
-import { verifyUser } from "@middleware/checkAuth";
+import authCheck from "@middleware/checkAuth";
 import { Router } from "express";
 
 import { commentValidators } from "./comment.validation";
@@ -8,11 +8,20 @@ import { commentController } from "./comment.controller";
 
 const router = Router();
 
+// Create a top-level comment (no parentId)
 router.post(
   "/create",
-  verifyUser,
+  authCheck(),
   zodValidator(commentValidators.create),
-  commentController.createComment,
+  commentController.createMainComment,
+);
+
+// Reply to an existing comment
+router.post(
+  "/reply",
+  authCheck(),
+  zodValidator(commentValidators.reply),
+  commentController.replyComment,
 );
 
 export const CommentRoutes = router;
