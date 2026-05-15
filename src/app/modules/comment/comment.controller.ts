@@ -27,6 +27,15 @@ const createMainComment = async (req: Request, res: Response) => {
     });
   }
 
+  // Prevent spoofing other users by setting authorId in body
+  if (Object.prototype.hasOwnProperty.call(payload, "authorId")) {
+    return sendResponse(res, {
+      httpStatusCode: status.BAD_REQUEST,
+      success: false,
+      message: "authorId cannot be set in the request body",
+    });
+  }
+
   const result = await commentService.createComment(user.id, payload);
 
   sendResponse(res, {
@@ -49,6 +58,15 @@ const replyComment = async (req: Request, res: Response) => {
   }
 
   const payload = req.body;
+
+  // Prevent spoofing other users by setting authorId in body
+  if (Object.prototype.hasOwnProperty.call(payload, "authorId")) {
+    return sendResponse(res, {
+      httpStatusCode: status.BAD_REQUEST,
+      success: false,
+      message: "authorId cannot be set in the request body",
+    });
+  }
 
   const result = await commentService.createReply(user.id, payload);
 
@@ -82,8 +100,44 @@ const listComments = async (req: Request, res: Response) => {
   });
 };
 
+const deleteComment = async (req: Request, res: Response) => {
+  const user = req.user;
+
+  if (!user) {
+    return sendResponse(res, {
+      httpStatusCode: status.UNAUTHORIZED,
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { id } = req.params;
+
+  const result = await commentService.deleteComment(
+    user.id,
+    id as string,
+    user.role,
+  );
+
+  if (!result) {
+    return sendResponse(res, {
+      httpStatusCode: status.NOT_FOUND,
+      success: false,
+      message: "Comment not found",
+    });
+  }
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Comment deleted successfully",
+    data: result,
+  });
+};
+
 export const commentController = {
   createMainComment,
   replyComment,
   listComments,
+  deleteComment,
 };

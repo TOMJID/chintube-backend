@@ -27,4 +27,7 @@ router.post(
   commentController.replyComment,
 );
 
+// Delete a comment (author or admin)
+router.delete("/:id", authCheck(), commentController.deleteComment);
+
 export const CommentRoutes = router;

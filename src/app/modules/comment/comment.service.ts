@@ -1,3 +1,4 @@
+import { Role } from "@orm/generated/prisma-client/enums";
 import { prisma } from "@lib/prisma";
 
 import AppError from "../../errorHelper/AppError";
@@ -87,8 +88,57 @@ const listComments = async ({ reviewId, skip = 0, take = 10 }: any) => {
   };
 };
 
+const deleteComment = async (userId: string, id: string, userRole?: Role) => {
+  const existing = await prisma.comment.findUnique({
+    where: { id },
+    include: { author: true },
+  });
+
+  if (!existing) return null;
+
+  if (userRole !== Role.ADMIN && existing.authorId !== userId) {
+    throw new AppError(403, "Forbidden: you can only delete your own comment");
+  }
+
+  // Collect all descendant comment IDs (including the root)
+  const toDelete: string[] = [id];
+  for (let i = 0; i < toDelete.length; i++) {
+    const cur = toDelete[i];
+    const children = await prisma.comment.findMany({
+      where: { parentId: cur },
+      select: { id: true },
+    });
+    for (const c of children) toDelete.push(c.id);
+  }
+
+  // If the user is not admin, ensure none of the descendants are owned by other users
+  if (userRole !== Role.ADMIN) {
+    const descendants = await prisma.comment.findMany({
+      where: { id: { in: toDelete } },
+      select: { id: true, authorId: true },
+    });
+
+    const others = descendants.filter((d) => d.authorId !== userId);
+    if (others.length > 0) {
+      throw new AppError(
+        403,
+        "Forbidden: cannot delete comment because it has replies authored by other users",
+      );
+    }
+  }
+
+  try {
+    await prisma.comment.deleteMany({ where: { id: { in: toDelete } } });
+    return existing;
+  } catch (error: any) {
+    if (error?.code === "P2025") return null;
+    throw error;
+  }
+};
+
 export const commentService = {
   createComment,
   createReply,
   listComments,
+  deleteComment,
 };
